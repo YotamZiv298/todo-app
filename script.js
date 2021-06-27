@@ -3,8 +3,14 @@ function addTask() {
     var inputTaskValue = document.getElementById("inputTask").value;
     var txt = document.createTextNode(inputTaskValue);
 
+    if (inputTaskValue != "") {
+        li.append(txt);
+        document.getElementById("todoList").appendChild(li);
+    } else {
+        alert("You must write something!");
+    }
 
-
+    document.getElementById("inputTask").value = "";
 }
 
 function addSubTask() {
