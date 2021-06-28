@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="background-color: pink;">
 
 <head>
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -10,16 +10,12 @@
     <center>
         <div id="" class="header">
             <h2>To Do List</h2>
-            <input type="text" id="inputTask" placeholder="...">
+            <input type="text" id="inputTask" placeholder="Add task...">
             <button onclick="addTask()" class="button">Add</button>
 
-            <input type="text" id="inputSearch">
-            <button onclick="search()" class="button">Search</button>
+            <input type="text" id="inputSearch" onkeyup="search()" placeholder="Search for tasks...">
         </div>
     </center>
-    <ul id="todoList">
-        <!--<li class="checked">Pay bills</li>-->
-    </ul>
 </body>
 
 <script type="text/javascript" src="script.js"></script>
