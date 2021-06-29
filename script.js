@@ -3,7 +3,7 @@ const NUM_OF_COL_SUB_TASK = 4;
 
 var numOfSubTasks = [];
 
-var taskNum = 1;
+var taskNum = 0;
 
 function checkInputValEmpty(elementId) {
     return document.getElementById(elementId).value == "" ? true : false;
@@ -14,6 +14,8 @@ function insertStringToElementValue(elementId, str) {
 }
 
 function addTask() {
+    taskNum++;
+
     let inputTaskValue = document.getElementById("inputTask").value;
 
     // Check if task text input is empty
@@ -73,7 +75,7 @@ function addTask() {
     // Create remove task button
     let buttonRemoveTask = document.createElement("button");
     buttonRemoveTask.textContent = "Remove";
-    buttonRemoveTask.setAttribute("onclick", "removeTask(this.className)");
+    buttonRemoveTask.setAttribute("onclick", "removeTask(this.closest('tr'), this.className)");
 
     tr.cells[0].appendChild(checkBoxCompleteTask);
     tr.cells[1].appendChild(inputTaskTxt);
@@ -92,7 +94,6 @@ function addTask() {
     }
 
     tbl.appendChild(tr);
-    taskNum++;
 }
 
 function completeTask(className) {
@@ -131,8 +132,21 @@ function addSubTask(tdParent, className) {
     }
     insertStringToElementValue("inputSubTask" + className.slice(-1), "");
     if (className.slice(-1) - 1 == numOfSubTasks.length) {
-        numOfSubTasks.push(1);
+        numOfSubTasks.push(0);
+    } else {
+        for (let i = 0; i < className.slice(-1); i++) {
+            try {
+                if (!numOfSubTasks[i]) {
+                    numOfSubTasks[i] = 0;
+                }
+            } catch (error) {
+                numOfSubTasks.push(0);
+            }
+        }
+        //[newFirstElement].concat(array)
     }
+    numOfSubTasks[className.slice(-1) - 1]++;
+
     if (numOfSubTasks[className.slice(-1) - 1] == 1) {
         var tbl = document.createElement("table");
 
@@ -185,72 +199,39 @@ function addSubTask(tdParent, className) {
     }
 
     tbl.appendChild(tr);
-    numOfSubTasks[className.slice(-1) - 1]++;
-
-
-    /*let inputSubTaskValue = document.getElementById("inputSubTask" + subTaskNum).value;
-    if (inputSubTaskValue == "") {
-        alert("You must write something!");
-        return;
-    }
-    insertStringToElementValue("inputSubTask" + subTaskNum, "");
-
-    let tdParent = document.getElementsByTagName("tr")[subTaskNum][3];
-
-    if (subTaskNum == 1) {
-        var tbl = document.createElement("table");
-        tbl.setAttribute("id", "subTasksTable")
-        tbl.setAttribute("cellpadding", "5");
-
-        tdParent.appendChild(tbl);
-    } else {
-        var tbl = document.getElementById("subTasksTable");
-    }
-
-    let tr = document.createElement("tr");
-
-    for (let i = 0; i < 3; i++) {
-        let td = document.createElement("td");
-        tr.appendChild(td)
-    }
-
-    let checkBoxCompleteSubTask = document.createElement("input");
-    checkBoxCompleteSubTask.setAttribute("type", "checkbox");
-    checkBoxCompleteSubTask.setAttribute("onchange", "completeTask(this.className)");
-
-    let inputSubTaskTxt = document.createElement("input");
-    inputSubTaskTxt.setAttribute("readonly", true);
-    inputSubTaskTxt.setAttribute("type", "text");
-    inputSubTaskTxt.setAttribute("value", inputSubTaskValue);
-
-    let buttonEditSubTask = document.createElement("button");
-    buttonEditSubTask.textContent = "Edit";
-    buttonEditSubTask.setAttribute("onclick", "editTask(this.className)");
-
-    tr.cells[0].appendChild(checkBoxCompleteSubTask);
-    tr.cells[1].appendChild(inputSubTaskTxt);
-    tr.cells[2].appendChild(buttonEditSubTask);
-
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < tr.cells[i].children.length; j++) {
-            tr.cells[i].children[j].setAttribute("class", "task" + subTaskNum);
-        }
-    }
-
-    tbl.appendChild(tr);
-    taskNum++;
-    */
+    //numOfSubTasks[className.slice(-1) - 1]++;
 }
 
-function removeTask(className) {
-    let tbl = document.getElementById("tasksTable");
-    //let tr = document.getElementByClassName(className);
-    let task = document.getElementsByClassName(className);
+function removeTask(trParent, className) {
+    let tbl = trParent.closest("table");
 
-    for (let i = 0; i < task.length; i++) {
-        tbl.removeChild(task[i]);
+    for (let i = 0, row; row = tbl.rows[i]; i++) {
+        if (i == className.slice(-1) - 1) {
+            row.parentNode.removeChild(row);
+            numOfSubTasks[className.slice(-1) - 1] = 0;
+            break;
+        }
     }
-    //tbl.removeChild(task[i]);
+    for (let i = 0, row, counter = 1; row = tbl.rows[i]; i++) {
+        for (let j = 0, col; col = row.cells[j]; j++) {
+            for (let k = 0; k < col.children.length; k++) {
+                col.children[k].className = "task" + counter;
+                if (col.children[k].id != "undefined") {
+                    if (col.children[k].nodeName.toUpperCase() == "input".toUpperCase()) {
+                        col.children[k].id = "inputSubTask" + counter;
+                    } else if (col.children[k].nodeName.toUpperCase() == "table".toUpperCase()) {
+                        col.children[k].id = "subTasksTable" + counter;
+                    }
+                }
+            }
+        }
+        counter++;
+    }
+
+    taskNum--;
+    if (!taskNum) {
+        taskNum = 0;
+    }
 }
 
 function search() {
